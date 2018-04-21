@@ -1,0 +1,14 @@
+# compose-file para nginx-proxy
+#
+#
+version: "3"
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine-0.7.0
+    container_name: nginx-proxy
+    network_mode: bridge
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    ports:
+      - 80:80

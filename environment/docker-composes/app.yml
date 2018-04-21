@@ -1,0 +1,32 @@
+# ambiente de desenvolvimento e produção com:
+# apache 2.4, php (baseado no .ini), mysql (baseado no .ini), dados db
+# salvos em: /var/mysql/data, arquivo de configuração
+# para inicializar mysql config/mysql/my.cnf
+#
+#
+version: "3"
+services:
+  web:
+    build:
+      context: ../
+      dockerfile: docker-files/php/Dockerfile.${ENVIRONMENT} #dev|prod
+      #passar p/ dockerFile ARGS
+      args:
+        - "PHP_VERSION=${PHP_VERSION}"
+        - "USER_ID=${USER_ID}"
+        - "GROUP_ID=${GROUP_ID}"
+        - "USER=${USER}"
+        - "APACHE_RUN_USER=${USER}"
+        - "APACHE_RUN_GROUP=${USER}"
+        - "VIRTUAL_HOST=${VIRTUAL_HOST}"
+    image: ${APP_NAME}/php:${PHP_VERSION}
+    network_mode: bridge
+    volumes:
+      #app_dir
+      - ../../:${PHP_WORK_DIR}
+    environment:
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+#    logging:
+#      driver: "syslog" #"json-file"
+#      options:
+#        tag: "{{.ImageName}}\\{{.Name}}\\{{.ID}}"

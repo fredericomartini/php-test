@@ -1,0 +1,65 @@
+# Versao PHP FROM .ini
+ARG PHP_VERSION 
+
+FROM php:${PHP_VERSION}
+#args (evaluated build time)
+ARG USER_ID=root
+ARG GROUP_ID=root
+ARG APACHE_RUN_USER
+ARG APACHE_RUN_GROUP
+ARG USER
+ARG VIRTUAL_HOST=app.local
+ARG COMPOSER_DIR=/usr/local/bin
+
+#envs (evaluated run time)
+#ID USUÁRIO HOST
+ENV USER_ID=${USER_ID}
+#GROUP_ID USUÁRIO HOST
+ENV GROUP_ID=${GROUP_ID} 
+#USUÁRIO QUE FICARÁ RODANDO APACHE
+ENV APACHE_RUN_USER=${APACHE_RUN_USER}
+#GRUPO QUE FICARÁ RODANDO APACHE
+ENV APACHE_RUN_GROUP=${APACHE_RUN_GROUP}
+#DIRETÓRIO FONTE PHP
+ENV PHP_WORK_DIR=/var/www/html/
+#USUÁRIO HOST
+ENV USER=${USER}
+#NOME PROJETO
+ENV VIRTUAL_HOST=${VIRTUAL_HOST}
+#VIRTUAL_HOST_PATH
+ENV VIRTUAL_HOST_PATH=/etc/apache2/sites-enabled/site.conf
+
+#Vim, pdo_mysql
+RUN apt-get update && apt-get install -y \
+		vim \
+		#Git
+		git \
+		&& docker-php-ext-install pdo_mysql \
+		#clear cache
+		&& apt-get clean \
+		&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+#apache2 rewrite
+RUN a2enmod rewrite
+
+#PHP ini
+COPY config/php/php-prod.ini /usr/local/etc/php/php.ini
+
+#VIRTUAL_HOST
+COPY config/apache2/sites-enabled/site.conf ${VIRTUAL_HOST_PATH}
+
+#replace "app" pelo $VIRTUAL_HOST
+RUN sed -i "s,ServerAlias app.*,ServerAlias ${VIRTUAL_HOST},g" ${VIRTUAL_HOST_PATH} \
+ && sed -i "s,ServerAlias \*.app.*,ServerAlias *.${VIRTUAL_HOST},g" ${VIRTUAL_HOST_PATH}
+
+# Criação usuário mesmo nome host, sem password
+RUN adduser --uid ${USER_ID} --gecos ${USER} --no-create-home --home ${PHP_WORK_DIR} --disabled-password ${USER}
+
+# Composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+	&& php -r "if (hash_file('SHA384', 'composer-setup.php') === '544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
+	&& php composer-setup.php --filename=composer --install-dir=${COMPOSER_DIR} \
+	&& php -r "unlink('composer-setup.php');"
+
+# Alteração dono PHP_WORK_DIR p/ usuário HOST
+RUN chown -R ${USER_ID}:${GROUP_ID} ${PHP_WORK_DIR}

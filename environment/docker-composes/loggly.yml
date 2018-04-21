@@ -1,0 +1,13 @@
+# compose-file para Loggly, enviar log de containers para conta no Loggly
+#
+#
+version: "3"
+services:
+  loggly:
+    image: sendgridlabs/loggly-docker:1.5
+    container_name: loggly
+    network_mode: bridge
+    restart: always
+    environment:
+      TOKEN: ${LOGGLY_CUSTOMER_TOKEN}
+      LOGGLY_PASSWORD: ${LOGGLY_PASSWORD}
