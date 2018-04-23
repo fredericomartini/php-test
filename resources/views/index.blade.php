@@ -37,12 +37,10 @@
                 </li>
             </ul>
             <div class="bd-example text-center">
-                <a href="{{ route('country-list')  }}" id="show-content" class="badge open-modal-window"
-                   style="width: 100%">
-                    <button type="button" class="btn btn-success" style="width: 100%">
-                        Show Content
-                    </button>
-                </a>
+                <button type="button" class="btn btn-success open-modal-window" style="width: 100%"
+                        href="{{ route('country-list')  }}">
+                    Show Content
+                </button>
             </div>
         </div>
     </div>
