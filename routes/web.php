@@ -11,6 +11,8 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+$this->get('/', ['as' => 'index', 'uses' => 'HomeController@index']);
+$this->get('/country-list',
+    ['as' => 'country-list', 'uses' => 'HomeController@countryList']);
+$this->get('/download-csv',
+    ['as' => 'download-csv', 'uses' => 'HomeController@downloadCsv']);
