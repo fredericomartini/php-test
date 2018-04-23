@@ -1,4 +1,3 @@
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -7,16 +6,25 @@
 
 require('./bootstrap');
 
-window.Vue = require('vue');
-
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
-
-Vue.component('example-component', require('./components/ExampleComponent.vue'));
-
-const app = new Vue({
-    el: '#app'
+$(function () {
+    /**
+     * Waiting for click .open-modal-window
+     */
+    $('.open-modal-window').on('click', function (event) {
+        event.preventDefault();
+        //request data
+        axios
+            .get($(this).attr('href'))
+            .then(function (response) {
+                let $data = response.data;
+                //Replaces content into the modal
+                //Modal body
+                let modal = $('#modal-default');
+                $('#modal-replaceable').html($data);
+                modal.modal('show');
+            })
+            .catch(function (error) {
+                console.log(error.response);
+            });
+    });
 });
