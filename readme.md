@@ -1,4 +1,4 @@
-### PHP Test Application Using Lumen
+### PHP Test Application Using Laravel 5.6
 #### Todo
 Please write a PHP web application and send it back a github link to us.
 
