@@ -1,7 +1,10 @@
 <?php
 
+namespace App\Interfaces;
+
 interface CountryListInterface
 {
-    public function getListFromSource();
+    public function getListAsArray();
 
+    public function getListAsCsv();
 }
